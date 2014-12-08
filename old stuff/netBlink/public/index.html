@@ -1,0 +1,84 @@
+<html>
+<body>
+	
+<script>
+
+var WEB_SOCKET_URL = "10.0.1.32:8000"
+
+var ws, 
+	wsConnected = false, 
+	connectionRetryTimeout = 1000; 
+	
+	
+var canvas = document.createElement('canvas'); 
+document.body.appendChild(canvas); 
+var ctx = canvas.getContext('2d');
+ctx.fillRect(0,0,canvas.width, canvas.height); 
+canvas.addEventListener('mousedown', onMouseDown); 
+canvas.addEventListener('mouseup', onMouseUp); 
+
+function onMouseDown(e) { 
+	
+	e.preventDefault();
+	sendObject({type:'light', data:'on'});
+}
+
+function onMouseUp(e) { 
+	e.preventDefault();
+	sendObject({type:'light', data:'off'});
+}
+
+ws = new WebSocket("ws://"+WEB_SOCKET_URL); 
+console.log('Attempting connection '+WEB_SOCKET_URL); 
+
+ws.onopen = function(e) { 
+	console.log('Connected to '+WEB_SOCKET_URL); 
+	wsConnected = true; 
+};
+
+ws.onmessage = function(e) { 
+	//console.log(e.data); 
+	
+	var msg = JSON.parse(e.data); 
+
+	console.log("RECEIVED : ", msg); 
+	
+
+};
+ws.onclose = function(e) { 
+	wsConnected = false; 
+	console.log("disconnected from "+WEB_SOCKET_URL); 
+	if(connectionRetryTimeout) { 
+		//setTimeout(initWebSocket,connectionRetryTimeout);  
+	}
+};
+
+function sendObject(obj) { 
+	sendMessage(JSON.stringify(obj)); 
+	console.log(JSON.stringify(obj));
+	
+}
+
+function sendMessage(msg) { 
+	if(wsConnected ) {
+		ws.send(msg); 
+	//	console.log(msg); 
+	}
+
+}
+
+
+function toggleLight() {
+	sendObject({type:"setLight", data:"on"}); 
+}
+	
+</script>
+
+
+<a href="javascript:sendObject({type:'light', data:'on'});">on</a> <a href="javascript:sendObject({type:'light', data:'off'});">off</a>
+
+	
+	
+	
+</body>
+</html>

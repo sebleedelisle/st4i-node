@@ -1,0 +1,9 @@
+{
+  "name": "mct-example",
+  "version": "0.0.1",
+  "description": "MCT Example by Seb Lee-Delisle",
+  "dependencies": {
+    "connect": "^1.x.x",
+    "websocket.io": "0.x.x"
+  }
+}
