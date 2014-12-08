@@ -1,9 +1,9 @@
 {
-  "name": "mct-example",
+  "name": "st4i-example1",
   "version": "0.0.1",
-  "description": "MCT Example by Seb Lee-Delisle",
+  "description": "ST4I Simple Websocket example by Seb Lee-Delisle",
   "dependencies": {
-    "connect": "^1.x.x",
+    "connect": "1.x.x",
     "websocket.io": "0.x.x"
   }
 }
