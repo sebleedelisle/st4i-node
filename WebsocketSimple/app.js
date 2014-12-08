@@ -9,7 +9,7 @@ var connect = require('connect'),
 var app = connect(); 
 
 app.use(connect.static(__dirname+'/public'));
-app.listen(8001); 
+app.listen(8101); 
 
 function broadcast(from, msg) {
   connections.forEach(function (socket) {

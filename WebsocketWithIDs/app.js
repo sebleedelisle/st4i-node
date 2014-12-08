@@ -10,7 +10,7 @@ var connect = require('connect'),
 var app = connect(); 
 
 app.use(connect.static(__dirname+'/public'));
-app.listen(8002); 
+app.listen(8102); 
 
 function broadcast(from, msg) {
   connections.forEach(function (client) {
