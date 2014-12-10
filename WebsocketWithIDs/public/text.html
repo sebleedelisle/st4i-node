@@ -1,0 +1,245 @@
+<html>
+<body>
+	
+<script>
+
+var WEB_SOCKET_URL = "node.seb.ly:8102"
+
+var ws, 
+	wsConnected = false, 
+	connectionRetryTimeout = 1000; 
+	
+var f = document.createElement("form");
+var i = document.createElement("input");
+i.type = "text";
+i.name = "user_name";
+i.id = "user_name1";
+i.style.width = 200; 
+i.style.height = 100;
+
+//create a button
+var s = document.createElement("input");
+s.type = "submit";
+s.value = "Submit";
+s.style.margin = 20;
+
+f.appendChild(i); 
+f.appendChild(s); 
+document.body.appendChild(f);
+
+f.addEventListener('submit', function(e) {
+	e.preventDefault(); 
+	console.log(e); 
+	sendObject({type:'message', data:i.value, id:'Seb'}); 
+}); 
+	
+var canvas = document.createElement('canvas'); 
+document.body.appendChild(canvas); 
+var ctx = canvas.getContext('2d');
+//ctx.fillRect(0,0,canvas.width, canvas.height); 
+canvas.addEventListener('mousedown', onMouseDown); 
+canvas.addEventListener('mouseup', onMouseUp); 
+canvas.width = window.innerWidth; 
+canvas.height = window.innerHeight; 
+
+var buttons = [];
+
+ws = new WebSocket("ws://"+WEB_SOCKET_URL); 
+console.log('Attempting connection '+WEB_SOCKET_URL); 
+
+
+function onMouseDown(e) { 
+	
+	e.preventDefault();
+	for(var i = 0; i<buttons.length; i++) { 
+		buttons[i].onMouseDown(e.clientX, e.clientY); 	
+	}
+	
+}
+
+function onMouseUp(e) { 
+	e.preventDefault();
+	for(var i = 0; i<buttons.length; i++) { 
+		buttons[i].onMouseUp(e.clientX, e.clientY); 	
+	}
+}
+
+
+
+ws.onopen = function(e) { 
+	console.log('Connected to '+WEB_SOCKET_URL); 
+	wsConnected = true; 
+	var id = getQueryVariable("id"); 
+	console.log("id", id);
+	if(id) sendObject({type:'register', id:id} );
+	else sendObject({type:'register'} );
+};
+
+ws.onmessage = function(e) { 
+	//console.log(e.data); 
+	
+	var msg = JSON.parse(e.data); 
+
+	console.log("RECEIVED : ", msg); 
+	if(msg.type =='light') { 
+		for(var i = 0; i<buttons.length; i++) { 
+			var button = buttons[i];
+			if(button.id == msg.id) { 
+				if(msg.data ==1) { 
+					button.colour = 'red'; 
+				} else { 
+					button.colour = 'black'; 
+				}
+			}
+		}
+		redrawButtons(); 
+	} else if(msg.type =='register') { 
+		addNewButton(msg.id); 
+	}
+	
+
+};
+
+function addNewButton(id) { 
+	if(!id) return;
+	
+	for(var i = 0; i<buttons.length;i++) { 
+		
+		if(id == buttons[i].id) return; 
+		
+	}
+	var button = new SocketButton(id, 10, 10); 
+	
+	buttons.push(button); 
+	reorganiseButtons(); 
+	redrawButtons(); 
+}
+
+function reorganiseButtons() { 
+	
+	buttons.sort(compare); 
+	var x = 10, y = 10, spacing = 110; 
+	for(var i = 0;i<buttons.length; i++) { 
+		var b = buttons[i]; 
+		b.x = x; 
+		b.y = y; 
+		x+=spacing; 
+		if(x+b.w>canvas.width) {
+			x = 10; 
+			y +=spacing; 
+		}
+	}
+	
+}
+function compare(a,b) {
+  if (a.id < b.id)
+     return -1;
+  if (a.id > b.id)
+    return 1;
+  return 0;
+}
+
+
+function redrawButtons() { 
+	ctx.clearRect(0,0,canvas.width,canvas.height); 
+	
+	for(var i = 0; i<buttons.length; i++) { 
+		buttons[i].draw(ctx); 
+		
+	}
+	
+	
+}
+
+
+ws.onclose = function(e) { 
+	wsConnected = false; 
+	console.log("disconnected from "+WEB_SOCKET_URL); 
+	if(connectionRetryTimeout) { 
+		//setTimeout(initWebSocket,connectionRetryTimeout);  
+	}
+};
+
+function sendObject(obj) { 
+	sendMessage(JSON.stringify(obj)); 
+	console.log(JSON.stringify(obj));
+	
+}
+
+function sendMessage(msg) { 
+	if(wsConnected ) {
+		ws.send(msg); 
+	//	console.log(msg); 
+	}
+
+}
+
+
+function getQueryVariable(variable)
+{
+       var query = window.location.search.substring(1);
+console.log(query); 
+       var vars = query.split("&");
+       for (var i=0;i<vars.length;i++) {
+               var pair = vars[i].split("=");
+console.log(pair);
+               if(pair[0] == variable){return pair[1];}
+       }
+       return(false);
+}
+
+
+function SocketButton(id, x, y) { 
+
+	this.x = x; 
+	this.y = y;
+	this.w = 100; 
+	this.h = 100; 
+	this.colour = 'black'; 
+	var mouseDown = false; 
+	this.id = id;
+	
+	this.draw = function(c) { 
+		c.fillStyle = this.colour; 
+		c.fillRect(this.x, this.y, this.w, this.h); 
+		c.font = '16px Menlo';
+		c.textAlign = 'center';
+		c.fillStyle = 'white'; 
+		c.fillText(this.id, this.x+this.w/2, this.y+this.h/2);
+		
+	};	
+	
+	this.onMouseDown = function(x, y) { 
+		//console.log(x,y, this.x, this.y, this.h, this.h);
+		if ((x>this.x) && (x <this.x+this.w) && (y>this.y) &&(y<this.y+this.h)) { 
+			sendObject({'type':'light', 'data':1, 'id' : this.	id});
+				
+			mouseDown = true; 
+		}
+			
+	}
+	this.onMouseUp = function(x, y) { 
+		if (mouseDown) { 
+			sendObject({'type':'light', 'data':0, 'id' : id});	
+			mouseDown = false; 
+		}	
+	}
+
+	this.changeColour = function(colour) { 
+		this.colour = colour; 
+	}
+	
+	this.changeColour('black');
+	
+}
+
+
+</script>
+	
+
+	
+	
+	
+	
+</body>
+</html>
