@@ -1,0 +1,9 @@
+{
+  "name": "st4i-example2",
+  "version": "0.0.1",
+  "description": "ST4I Websocket with ID Example by Seb Lee-Delisle",
+  "dependencies": {
+    "connect": "1.x.x",
+    "websocket.io": "0.x.x"
+  }
+}
