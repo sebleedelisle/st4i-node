@@ -4,6 +4,7 @@
   "description": "ST4I Websocket with ID Example by Seb Lee-Delisle",
   "dependencies": {
     "connect": "1.x.x",
-    "websocket.io": "0.x.x"
+    "websocket.io": "0.x.x",
+ 	"xmlrpc": "*"
   }
 }
