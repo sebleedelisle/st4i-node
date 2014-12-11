@@ -27,12 +27,11 @@ var server = http.createServer(function (request, response) {
   var deserializer = new Deserializer();
   
   deserializer.deserializeMethodCall(request, function(error, methodName, params) {
-    var xml = Serializer.serializeMethodResponse(Date.now().toString(32));;
+    var statusCode = 200, xml = Serializer.serializeMethodResponse(Date.now().toString(32));;
     if (!error) {
   
       console.log("deserialized:", methodName, params,"\n");
   
-      var statusCode = 200, xml = null;
   
       switch (methodName) {
   
@@ -57,10 +56,14 @@ var server = http.createServer(function (request, response) {
           //params.shift();  // blogid? 
 
    
-         // var params = params[3];;
- 		 //var post_data = querystring.stringify(params[3]);
-           console.log(params);  
+           var params = params[3];
+           
+           console.log(params);
+           console.log(params.description); 
+           console.log('---------------------');
 
+           var msg = {type:'message', data:params.description};    
+           broadcast(null, JSON.stringify(msg));
           xml = Serializer.serializeMethodResponse(Date.now().toString(32)); // a "postid", presumably ignored by IFTTT
           break;
         default:
@@ -72,6 +75,7 @@ var server = http.createServer(function (request, response) {
       xml = Serializer.serializeFault(error);
     }
 	// write response back to API call from IfTTT
+	console.log(xml);
     response.writeHead(statusCode, {'Content-Type': 'text/xml', 'Content-Length': xml.length});
     response.end(xml);
   });
@@ -86,6 +90,7 @@ server.listen(process.env.PORT || 80);
 
 
 function broadcast(from, msg) {
+  console.log("sending", msg);
   connections.forEach(function (client) {
     if ((from !== client)){
       client.send(msg);
