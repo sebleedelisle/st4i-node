@@ -25,6 +25,7 @@ var ws,
 	connectionRetryTimeout = 1000; 
 	
 
+
 	
 
 var textInputs = [];
@@ -210,8 +211,6 @@ function SocketButton(id, x, y) {
 	};	
 	
 	this.onMouseDown = function(x, y) { 
-		x-=canvas.offsetLeft; 
-		y-=canvas.offsetTop; 
 		//console.log(x,y, this.x, this.y, this.h, this.h);
 		if ((x>this.x) && (x <this.x+this.w) && (y>this.y) &&(y<this.y+this.h)) { 
 			sendObject({'type':'light', 'data':1, 'id' : this.	id});
