@@ -27,7 +27,7 @@ var server = http.createServer(function (request, response) {
   var deserializer = new Deserializer();
   
   deserializer.deserializeMethodCall(request, function(error, methodName, params) {
-    var xml = null;
+    var xml = Serializer.serializeMethodResponse(Date.now().toString(32));;
     if (!error) {
   
       console.log("deserialized:", methodName, params,"\n");
