@@ -35,9 +35,9 @@ console.log('Attempting connection '+WEB_SOCKET_URL);
 ws.onopen = function(e) { 
 	console.log('Connected to '+WEB_SOCKET_URL); 
 	wsConnected = true; 
-	var id = getQueryVariable("id"); 
-	console.log("id", id);
-	if(id) sendObject({type:'register', id:id} );
+	var group = getQueryVariable("group"); 
+	console.log("group", group);
+	if(group) sendObject({type:'register', group:group} );
 	else sendObject({type:'register'} );
 };
 
@@ -50,26 +50,26 @@ ws.onmessage = function(e) {
 	if(msg.type =='message') { 
 		for(var i = 0; i<textInputs.length; i++) { 
 			var textInput = textInputs[i];
-			if(textInput.id == msg.id) { 
+			if(textInput.group == msg.group) { 
 				textInput.showIncoming(msg.data); 
 			}
 		}
 		
 	} else if(msg.type =='register') { 
-		addNewTextInput(msg.id); 
+		addNewTextInput(msg.group); 
 	}	
 
 };
 
-function addNewTextInput(id) { 
-	if(!id) return;
+function addNewTextInput(group) { 
+	if(!group) return;
 	
 	for(var i = 0; i<textInputs.length;i++) { 
 		
-		if(id == textInputs[i].id) return; 
+		if(group == textInputs[i].group) return; 
 		
 	}
-	var textInput = new TextInput(id); 
+	var textInput = new TextInput(group); 
 	
 	textInputs.push(textInput); 
 	reorganiseTextInputs();
@@ -89,9 +89,9 @@ function reorganiseTextInputs() {
 	
 }
 function compare(a,b) {
-  if (a.id < b.id)
+  if (a.group < b.group)
      return -1;
-  if (a.id > b.id)
+  if (a.group > b.group)
     return 1;
   return 0;
 }
@@ -136,16 +136,16 @@ console.log(pair);
 }
 
 
-function TextInput(id) { 
+function TextInput(group) { 
 	
-	this.id = id; 
+	this.group = group; 
 	
 	
 	var f = document.createElement("form");
 	var i = document.createElement("textarea");
 	i.type = "text";
 	i.name = "user_name";
-	i.id = "user_name1";
+	i.group = "user_name1";
 	i.style.width = 200; 
 	i.style.height = 50;
 	
@@ -154,7 +154,7 @@ function TextInput(id) {
 	s.type = "submit";
 	s.value = "Submit";
 	s.style.margin = 20;
-	f.innerHTML = '<b>' + id + '</b><br>'; 
+	f.innerHTML = '<b>' + group + '</b><br>'; 
 	f.appendChild(i); 
 	f.appendChild(s); 
 	
@@ -167,7 +167,7 @@ function TextInput(id) {
 	f.addEventListener('submit', function(e) {
 		e.preventDefault(); 
 		console.log(e); 
-		sendObject({type:'message', data:i.value, id:id}); 
+		sendObject({type:'message', data:i.value, group:group}); 
 		i.value = ''; 
 	});
 	this.showIncoming = function(msg) { 
@@ -189,7 +189,7 @@ function TextInput(id) {
 }
 
 
-function SocketButton(id, x, y) { 
+function SocketButton(group, x, y) { 
 
 	this.x = x; 
 	this.y = y;
@@ -197,7 +197,7 @@ function SocketButton(id, x, y) {
 	this.h = 100; 
 	this.colour = 'black'; 
 	var mouseDown = false; 
-	this.id = id;
+	this.group = group;
 	
 	this.draw = function(c) { 
 		c.fillStyle = this.colour; 
@@ -205,7 +205,7 @@ function SocketButton(id, x, y) {
 		c.font = '16px Menlo';
 		c.textAlign = 'center';
 		c.fillStyle = 'white'; 
-		c.fillText(this.id, this.x+this.w/2, this.y+this.h/2);
+		c.fillText(this.group, this.x+this.w/2, this.y+this.h/2);
 		
 	};	
 	
@@ -214,7 +214,7 @@ function SocketButton(id, x, y) {
 		y-=canvas.offsetTop; 
 		//console.log(x,y, this.x, this.y, this.h, this.h);
 		if ((x>this.x) && (x <this.x+this.w) && (y>this.y) &&(y<this.y+this.h)) { 
-			sendObject({'type':'light', 'data':1, 'id' : this.	id});
+			sendObject({'type':'light', 'data':1, 'group' : this.group});
 				
 			mouseDown = true; 
 		}
@@ -222,7 +222,7 @@ function SocketButton(id, x, y) {
 	}
 	this.onMouseUp = function(x, y) { 
 		if (mouseDown) { 
-			sendObject({'type':'light', 'data':0, 'id' : id});	
+			sendObject({'type':'light', 'data':0, 'group' : group});	
 			mouseDown = false; 
 		}	
 	}
