@@ -59,11 +59,11 @@ var server = http.createServer(function (request, response) {
            var params = params[3];
            
            console.log(params);
-           console.log(params.description); 
+           console.log(params.title); 
            console.log('---------------------');
-
-           var msg = {type:'message', data:params.description};    
-           broadcast(null, JSON.stringify(msg));
+           var msg = {type:'message', data:params.title};    
+           broadcast(null, JSON. 		 //var post_data = querystring.stringify(params[3]);
+msg);
           xml = Serializer.serializeMethodResponse(Date.now().toString(32)); // a "postid", presumably ignored by IFTTT
           break;
         default:
@@ -90,7 +90,6 @@ server.listen(process.env.PORT || 80);
 
 
 function broadcast(from, msg) {
-  console.log("sending", msg);
   connections.forEach(function (client) {
     if ((from !== client)){
       client.send(msg);
