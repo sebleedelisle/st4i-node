@@ -51,11 +51,11 @@ ws.attach(app).on('connection', function(client){
 			return;
 		}	
 		if(json.type == 'register') { 
-			client.id = json.id; 
+			client.group = json.group; 
 			
 			connections.forEach(function (sourceclient) {
-				if((sourceclient!=client)&&(sourceclient.id))
-					client.send(JSON.stringify({'type':'register', 'id':sourceclient.id}));	
+				if((sourceclient!=client)&&(sourceclient.group))
+					client.send(JSON.stringify({'type':'register', 'group':sourceclient.group}));	
 			});
 		}
 			
