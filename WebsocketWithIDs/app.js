@@ -15,9 +15,9 @@ app.listen(8102);
 function broadcast(from, msg) {
   if(msg.length>1000) return; 
   connections.forEach(function (client) {
-//    if ((from!=client) && ((!client.group) || (client.group==from.group))){
+    if (from!=client){
       client.send(msg);
-//    }
+    }
   });
 }
 
@@ -52,24 +52,24 @@ ws.attach(app).on('connection', function(client){
 		}	
 		if(json.type == 'register') { 
 			
-			// a new client is registering its group with us
+			// a new client is registering its id with us
 			
-			client.group = json.group; 
-			console.log('registering new group ', client.group); 
+			client.id = json.id; 
+			console.log('registering new id ', client.id); 
 			
 			// so we go through all the connections
 
 			connections.forEach(function (sourceclient) {
 
-				if((sourceclient!=client)&&(sourceclient.group)) {
+				if((sourceclient!=client)&&(sourceclient.id)) {
 
-					// and send all the existing clients the new group
+					// and send all the existing clients the new id
 
-					console.log('sending ', sourceclient.group, ' to ', client.group); 
-					client.send(JSON.stringify({'type':'register', 'group':sourceclient.group}));
+					console.log('sending ', sourceclient.id, ' to ', client.id); 
+					client.send(JSON.stringify({'type':'register', 'id':sourceclient.id}));
 					
-					// and send the new client to all the other groups
-					sourceclient.send(JSON.stringify({'type':'register', 'group': client.group})); 
+					// and send the new client to all the other ids
+					sourceclient.send(JSON.stringify({'type':'register', 'id': client.id})); 
 	
 				}
 			});
