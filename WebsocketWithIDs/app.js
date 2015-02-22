@@ -15,9 +15,9 @@ app.listen(8102);
 function broadcast(from, msg) {
   if(msg.length>1000) return; 
   connections.forEach(function (client) {
-    if (from!=client){
+    //if (from!=client){
       client.send(msg);
-    }
+    //}
   });
 }
 
