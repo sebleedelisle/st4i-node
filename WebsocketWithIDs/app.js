@@ -23,7 +23,7 @@ function broadcast(from, msg) {
 
 ws.attach(app).on('connection', function(client){
 
-	client.send(JSON.stringify({type:'connect'})); 
+//	client.send(JSON.stringify({type:'connect'})); 
 	
 	console.log('connected'); 
 	//console.log(client); 

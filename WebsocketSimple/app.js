@@ -21,6 +21,7 @@ function broadcast(from, msg) {
 
 ws.attach(app).on('connection', function(sock){
 
+	console.log("new client", sock); 
 	sock.send(JSON.stringify({type:'connect'})); 
 	
 	console.log('connected'); 
